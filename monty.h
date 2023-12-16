@@ -2,13 +2,9 @@
 #define MONTY_H
 
 #include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <ctype.h>
+#include <string.h>
+
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
  * @n: integer
@@ -40,69 +36,51 @@ typedef struct instruction_s
 } instruction_t;
 
 /**
- * struct buf_struct - Global buffers.
- * @read_buff: Buffer for read.
- * @list_cmd: Tokenized read buffer.
- * @tok_cmd: Tokenize each token from previous split based on spaces.
- * @argv: Arguments from command line.
- *
- * Description: - Buffers used globally throughout files.
+ * enum stack_queue_mode - mode for queue and stack behavior
+ * @STACK: stack mode to push to top
+ * @QUEUE: queue mode to push to the end
  */
-typedef struct buf_struct
+enum stack_queue_mode
 {
-	char read_buff[4096];
-	char *list_cmd[1000];
-	char *tok_cmd[1000];
-	char **argv;
-} buf_struct;
+	STACK,
+	QUEUE
+};
 
+/**
+ * struct allocated_s - contains memory to free, push value and stack mode
+ * @n: integer value for the push opcode
+ * @token: tokenized opcode to free
+ * @mode: mode to format data to Stack(1) or Queue(0)
+ * @pScript: file pointer to Monty bytecode file
+ */
+typedef struct allocated_s
+{
+	char *n;
+	char *token;
+	FILE *pScript;
+	enum stack_queue_mode mode;
+} allocated_t;
 
-/* Execute functions */
+extern allocated_t mem;
+void execute_script(void);
+void stack_push(stack_t **stack, unsigned int line_number);
+void stack_pall(stack_t **stack, unsigned int line_number);
+void stack_pint(stack_t **stack, unsigned int line_number);
+void stack_pop(stack_t **stack, unsigned int line_number);
+void stack_swap(stack_t **stack, unsigned int line_number);
+void stack_add(stack_t **stack, unsigned int line_number);
+void stack_nop(stack_t **stack, unsigned int line_number);
+void stack_sub(stack_t **stack, unsigned int line_number);
+void stack_div(stack_t **stack, unsigned int line_number);
+void stack_mul(stack_t **stack, unsigned int line_number);
+void stack_mod(stack_t **stack, unsigned int line_number);
+void stack_pchar(stack_t **stack, unsigned int line_number);
+void stack_pstr(stack_t **stack, unsigned int line_number);
+void stack_rotl(stack_t **stack, unsigned int line_number);
+void stack_rotr(stack_t **stack, unsigned int line_number);
+void op_stack(stack_t **stack, unsigned int line_number);
+void op_queue(stack_t **stack, unsigned int line_number);
+void free_all(stack_t *stack);
+int isNum(char *str);
 
-void (*get_op_func(char *s))(stack_t **stack, unsigned int line_number);
-void exec_loop(buf_struct *a);
-
-/* End of execute functions */
-
-/* String functions */
-
-char **split_spaces(char *buff, buf_struct *a);
-char **split_newline(buf_struct *a);
-buf_struct *make_struct(char *argv[]);
-
-/*End of string functions */
-
-/* Doubly linked list functions */
-
-void free_stack(stack_t *head);
-
-/* End of Doubly linked list functions */
-
-/* Helper functions */
-
-int digits_only(char *str);
-
-/* End of helper functions */
-
-/* monty functions */
-
-stack_t *push(stack_t **head, int n);
-void pall(stack_t **h, unsigned int line_n);
-void pint(stack_t **h, unsigned int line_n);
-void pop(stack_t **h, unsigned int line_n);
-void swap(stack_t **stack, unsigned int line_n);
-void add(stack_t **stack, unsigned int line_n);
-void sub(stack_t **stack, unsigned int line_n);
-void _div(stack_t **stack, unsigned int line_n);
-void mod(stack_t **stack, unsigned int line_n);
-void mul(stack_t **stack, unsigned int line_n);
-void nop(stack_t **stack, unsigned int line_n);
-void pchar(stack_t **stack, unsigned int line_n);
-void pstr(stack_t **stack, unsigned int line_n);
-void rotl(stack_t **stack, unsigned int line_n);
-void rotr(stack_t **stack, unsigned int line_n);
-void queue(stack_t **stack, unsigned int line_n);
-
-/* end of monty functions */
-
-#endif /*MONTY_H*/
+#endif
